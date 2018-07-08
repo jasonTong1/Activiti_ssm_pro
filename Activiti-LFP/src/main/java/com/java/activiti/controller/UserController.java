@@ -27,6 +27,7 @@ import com.java.activiti.util.ResponseUtil;
 
 /**
  * 用户管理
+ * 
  * @author Administrator
  *
  */
@@ -36,74 +37,74 @@ public class UserController {
 
 	@Resource
 	private UserService userService;
-	
+
 	@Resource
 	private MemberShipService menberShipService;
-	
+
 	@Resource
 	private GroupService groupService;
+
 	/**
 	 * 
 	 * 登入
+	 * 
 	 * @param response
 	 * @param request
 	 * @return
 	 * @throws Exception
 	 */
 	@RequestMapping("/userLogin")
-	public String userLogin(HttpServletResponse response,HttpServletRequest request) throws Exception{
-		Map<String,Object> map=new HashMap<String, Object>();
+	public String userLogin(HttpServletResponse response, HttpServletRequest request) throws Exception {
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("userName", request.getParameter("userName"));
 		map.put("password", request.getParameter("password"));
 		map.put("groupId", request.getParameter("groupId"));
-		MemberShip memberShip=menberShipService.userLogin(map);
-		JSONObject result=new JSONObject();
-		if(memberShip==null){
+		MemberShip memberShip = menberShipService.userLogin(map);
+		JSONObject result = new JSONObject();
+		if (memberShip == null) {
 			result.put("success", false);
 			result.put("errorInfo", "用户名或者密码错误！");
-		}else{
+		} else {
 			result.put("success", true);
 			request.getSession().setAttribute("currentMemberShip", memberShip);
 		}
 		ResponseUtil.write(response, result);
 		return null;
 	}
-	
+
 	@RequestMapping("/logout")
-	public String logout(HttpServletResponse response,HttpServletRequest request) throws Exception{
+	public String logout(HttpServletResponse response, HttpServletRequest request) throws Exception {
 
 		request.getSession().removeAttribute("currentMemberShip");
 		request.getSession().invalidate();
-		
+
 		return "login";
 	}
-	
+
 	/**
 	 * 分页查询用户
+	 * 
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	@RequestMapping("/userPage")
-	public String userPage(HttpServletResponse response,
-			@RequestParam(value = "page", required = false) String page,
-			@RequestParam(value = "rows", required = false) String rows,
-			User user) throws Exception{
-		Map<String,Object> userMap=new HashMap<String, Object>();
+	public String userPage(HttpServletResponse response, @RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = "rows", required = false) String rows, User user) throws Exception {
+		Map<String, Object> userMap = new HashMap<String, Object>();
 		userMap.put("id", user.getId());
-		
+
 		PageInfo<User> userPage = new PageInfo<User>();
-		Integer pageSize=Integer.parseInt(rows);
+		Integer pageSize = Integer.parseInt(rows);
 		userPage.setPageSize(pageSize);
-		
+
 		// 第几页
 		String pageIndex = page;
 		if (pageIndex == null || pageIndex == "") {
 			pageIndex = "1";
 		}
-		userPage.setPageIndex((Integer.parseInt(pageIndex) - 1)
-				* pageSize);
+		userPage.setPageIndex((Integer.parseInt(pageIndex) - 1) * pageSize);
 		// 取得总页数
-		int userCount=userService.userCount(userMap);
+		int userCount = userService.userCount(userMap);
 		userPage.setCount(userCount);
 		userMap.put("pageIndex", userPage.getPageIndex());
 		userMap.put("pageSize", userPage.getPageSize());
@@ -117,43 +118,47 @@ public class UserController {
 		ResponseUtil.write(response, json);
 		return null;
 	}
+
 	/**
 	 * 修改用户
+	 * 
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	@RequestMapping("/updateUser")
-	public String updateUser(HttpServletResponse response,User uses) throws Exception{
-		int result=userService.updateUser(uses);
-		JSONObject json=new JSONObject();
-		if(result>0){
+	public String updateUser(HttpServletResponse response, User uses) throws Exception {
+		int result = userService.updateUser(uses);
+		JSONObject json = new JSONObject();
+		if (result > 0) {
 			json.put("success", true);
-		}else{
+		} else {
 			json.put("success", false);
 		}
 		ResponseUtil.write(response, json);
 		return null;
 	}
+
 	/**
 	 * 批量刪除用戶
+	 * 
 	 * @param response
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	@RequestMapping("/deleteUser")
-	public String deleteUser(HttpServletResponse response,HttpServletRequest request) throws Exception{
-		String id=request.getParameter("ids");
-		JSONObject json=new JSONObject();
-		List<String> list=new ArrayList<String>();
-		  String[] strs = id.split(",");
-	        for (String str : strs) {
-	        	list.add(str);
-	        }
-	   try {	
-			int userResult=userService.deleteUser(list);
-			if(userResult>0){
+	public String deleteUser(HttpServletResponse response, HttpServletRequest request) throws Exception {
+		String id = request.getParameter("ids");
+		JSONObject json = new JSONObject();
+		List<String> list = new ArrayList<String>();
+		String[] strs = id.split(",");
+		for (String str : strs) {
+			list.add(str);
+		}
+		try {
+			int userResult = userService.deleteUser(list);
+			if (userResult > 0) {
 				json.put("success", true);
-			}else{
+			} else {
 				json.put("success", false);
 			}
 		} catch (Exception e) {
@@ -166,63 +171,78 @@ public class UserController {
 
 	/**
 	 * 新增用戶
+	 * 
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	@RequestMapping("/userSave")
-	public String userSave(HttpServletResponse response,User user) throws Exception{
-		int userResult=userService.addUser(user);
-		JSONObject json=new JSONObject();
-		if(userResult>0){
+	public String userSave(HttpServletResponse response, User user) throws Exception {
+		int userResult = userService.addUser(user);
+		JSONObject json = new JSONObject();
+		if (userResult > 0) {
 			json.put("success", true);
-		}else{
+		} else {
 			json.put("success", false);
 		}
 		ResponseUtil.write(response, json);
 		return null;
 	}
-	
+
+	@RequestMapping("/existUserName")
+	public String existUserName(HttpServletResponse response,
+			@RequestParam(value = "userName", required = true) String userName) throws Exception {
+		User userResult = userService.findById(userName);
+		JSONObject result = new JSONObject();
+		if (userResult !=null) {
+			result.put("exist", true);
+		} else {
+			result.put("exist", false);
+		}
+
+		ResponseUtil.write(response, result);
+		return null;
+	}
+
 	@RequestMapping("/listWithGroups")
-	public String listWithGroups(HttpServletResponse response,String rows,String page,User user) throws Exception{
-		PageInfo<User> userPage=new PageInfo<User>();
-		Map<String,Object> userMap=new HashMap<String, Object>();
+	public String listWithGroups(HttpServletResponse response, String rows, String page, User user) throws Exception {
+		PageInfo<User> userPage = new PageInfo<User>();
+		Map<String, Object> userMap = new HashMap<String, Object>();
 		userMap.put("id", user.getId());
-		Integer pageSize=Integer.parseInt(rows);
+		Integer pageSize = Integer.parseInt(rows);
 		userPage.setPageSize(pageSize);
-		
+
 		// 第几页
 		String pageIndex = page;
 		if (pageIndex == null || pageIndex == "") {
 			pageIndex = "1";
 		}
-		userPage.setPageIndex((Integer.parseInt(pageIndex) - 1)
-				* pageSize);
+		userPage.setPageIndex((Integer.parseInt(pageIndex) - 1) * pageSize);
 		// 取得总页数
-		int userCount=userService.userCount(userMap);
+		int userCount = userService.userCount(userMap);
 		userPage.setCount(userCount);
 		userMap.put("pageIndex", userPage.getPageIndex());
 		userMap.put("pageSize", userPage.getPageSize());
 
 		List<User> userList = userService.userPage(userMap);
-		for(User users:userList){
-			StringBuffer buffer=new StringBuffer();
-			List<Group> groupList=groupService.findByUserId(users.getId());
-			for(Group g:groupList){
-				buffer.append(g.getName()+",");
+		for (User users : userList) {
+			StringBuffer buffer = new StringBuffer();
+			List<Group> groupList = groupService.findByUserId(users.getId());
+			for (Group g : groupList) {
+				buffer.append(g.getName() + ",");
 			}
-			if(buffer.length()>0){
-				//deleteCharAt 删除最后一个元素
-				users.setGroups(buffer.deleteCharAt(buffer.length()-1).toString());
-			}else{
+			if (buffer.length() > 0) {
+				// deleteCharAt 删除最后一个元素
+				users.setGroups(buffer.deleteCharAt(buffer.length() - 1).toString());
+			} else {
 				user.setGroups(buffer.toString());
 			}
 		}
-		JSONArray jsonArray=JSONArray.fromObject(userList);
-		JSONObject result=new JSONObject();
+		JSONArray jsonArray = JSONArray.fromObject(userList);
+		JSONObject result = new JSONObject();
 		result.put("rows", jsonArray);
 		result.put("total", userCount);
 		ResponseUtil.write(response, result);
 		return null;
 	}
-	
+
 }
